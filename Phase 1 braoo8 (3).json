@@ -1,0 +1,714 @@
+{
+  "name": "Phase 1 braoo8",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c3730e7d-d2f4-4dcd-922d-6e878de138f5",
+              "leftValue": "={{ $('Get row(s) in sheet').item.json.Code }}",
+              "rightValue": "=If the value for this  {{ $json['Cuit Cuil Dni'] }}is empty send it as false",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "70093849-1d0c-458f-981f-fc565420891e",
+              "leftValue": "={{ $json.quantity }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1760,
+        300
+      ],
+      "id": "e32705db-5863-4ca4-97fb-109ca4efbd0f",
+      "name": "Check if data is correct"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1uYTCaFZRwAD-9vCq32-feYjr0BbYRo-7O7H7zwP_O3A",
+          "mode": "list",
+          "cachedResultName": "Central Order Log Sheet ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1uYTCaFZRwAD-9vCq32-feYjr0BbYRo-7O7H7zwP_O3A/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1uYTCaFZRwAD-9vCq32-feYjr0BbYRo-7O7H7zwP_O3A/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "customer_name": "={{ $('Generate the work order').item.json.work_order.customer }}",
+            "order_id": "={{ $json.id }}",
+            "quantity": "={{ $('Generate the work order').item.json.work_order.product.quantity }}",
+            "unit_price": "={{ $('Generate the work order').item.json.work_order.product.unit_price }}",
+            "sent_to_email": "={{ $('MCP').item.json['Customer email'] }}",
+            "product_code": "={{ $('Generate the work order').item.json.work_order.product.code }}",
+            "product_name": "={{ $('MCP').item.json.Description }}"
+          },
+          "matchingColumns": [
+            "customer_name"
+          ],
+          "schema": [
+            {
+              "id": "order_id",
+              "displayName": "order_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "product_code",
+              "displayName": "product_code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "product_name",
+              "displayName": "product_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "quantity",
+              "displayName": "quantity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "unit_price",
+              "displayName": "unit_price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "total_price",
+              "displayName": "total_price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sent_to_email",
+              "displayName": "sent_to_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -660,
+        400
+      ],
+      "id": "3873697c-cf42-4c2f-89da-32a053e1b738",
+      "name": "Record order",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "FET9SywrvjtRSaY2",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.work_order.email }}",
+        "subject": "New order",
+        "emailType": "text",
+        "message": "=📦 NEW WORK ORDER  🧍 Customer:{{ $json.work_order.customer }} 📧 Email: {{ $json.work_order.email }} 🛒 Product Code:{{ $json.work_order.product.code }}  🔢 Quantity: {{ $json.work_order.product.quantity }} 💰 Unit Price: {{ $json.work_order.product.unit_price }}💵 Total: {{ Number($json.work_order.product.unit_price) * $json.work_order.product.quantity }}  📌 Order Type: {{ $json.work_order.order_type }} 📆 Date: {{ new Date().toISOString().slice(0, 10) }} 🧾 ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -880,
+        400
+      ],
+      "id": "3986b3dc-cc38-4724-8527-587a086fd29f",
+      "name": "send order",
+      "webhookId": "abb60577-2f0e-47fa-a0a3-91c064db32ec",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9bXmgSW4H8j0BGii",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"work_order\": {\n    \"customer\": \"{{ $('MCP').item.json['Customer name'] || 'N/A' }}\",\n    \"email\": \"{{ $('MCP').item.json['Customer email'] || 'noemail@example.com' }}\",\n    \"product\": {\n      \"code\": \"{{ $('MCP').item.json.Code || 'UNKNOWN' }}\",\n      \"quantity\": \"{{ $('MCP').item.json.quantity || 0 }}\",\n      \"unit_price\": \"{{ $json.UNITARIO || 0 }}\"\n    },\n    \"order_type\": \"{{ $('Get row(s) in sheet').item.json.order_type || 'standard' }}\",\n    \"date\": \"{{ $('Schedule Trigger').item.json['Readable date'] || 'Unknown Date' }}\",\n    \"Total\": \"{{ ($json.UNITARIO || 0) * ($('MCP').item.json.quantity || 0) }}\"\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1100,
+        400
+      ],
+      "id": "958504a3-bc2a-4a43-b376-6c7d02a0da73",
+      "name": "Generate the work order"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1jWIE9hirjbvhQ99oCzLCOR2ClGr7nuFE2Ky54f9v1u4",
+          "mode": "list",
+          "cachedResultName": "Untitled spreadsheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jWIE9hirjbvhQ99oCzLCOR2ClGr7nuFE2Ky54f9v1u4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 487738133,
+          "mode": "list",
+          "cachedResultName": "Proforma Invoice",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jWIE9hirjbvhQ99oCzLCOR2ClGr7nuFE2Ky54f9v1u4/edit#gid=487738133"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -1320,
+        400
+      ],
+      "id": "6a2bee5c-92db-4c6b-a816-a90253531808",
+      "name": "Look up extra info",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "FET9SywrvjtRSaY2",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.customer_email }}",
+        "subject": "Missing Information in Your Work Order",
+        "emailType": "text",
+        "message": "=Thank you for submitting your work order. However, we noticed that some required information is missing:\n\n✅ Product Code\n\n✅ Quantity\n\n✅ Email Address\n\nPlease review your submission and resend the complete details so we can process your order without delay.\n\nIf you need assistance, feel free to contact us directly.\n\nBest regards,",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -1540,
+        200
+      ],
+      "id": "3f006097-c899-4c27-89e1-e5942550c24e",
+      "name": "Missing data",
+      "webhookId": "8048838f-02f3-482f-aef0-caf64b061a3a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9bXmgSW4H8j0BGii",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2860,
+        250
+      ],
+      "id": "032a2d9e-901a-4548-9b2c-53a39fdb10f8",
+      "name": "Telegram Trigger",
+      "webhookId": "9d48f6b4-cdaf-47a2-a0c4-3defbecb5f1b",
+      "credentials": {
+        "telegramApi": {
+          "id": "vvRkEeCp1MAnJL81",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const orderId = `ORD-${Date.now()}`;\n  return {\n    json: {\n      ...item.json,\n      OrderID: orderId,\n      TotalPrice: item.json.Price * item.json.Quantity,\n      Status: 'Ready',\n    }\n  }\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1540,
+        400
+      ],
+      "id": "78d3e6c4-0236-4e79-b662-12c2945d2207",
+      "name": "MCP"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ocr.space/parse/image",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "3a258799b988957"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "Text",
+              "value": "English"
+            },
+            {
+              "name": "file\t",
+              "value": "={{ $json.result.file_path }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2200,
+        250
+      ],
+      "id": "253b71fe-7607-43f8-93d5-9c4f17413f09",
+      "name": "OCR"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the text extracted by the OCR node\nconst text = $('OCR').item.json.ParsedResults?.[0]?.ParsedText || '';\n\n// Find \"quantity\" in the text (looks for the word and a number after it)\nconst quantityMatch = text.match(/quantity\\s*[:\\-]?\\s*(\\d+)/i);\n\n// Find \"code\" in the text (looks for the word and a code after it)\nconst codeMatch = text.match(/code\\s*[:\\-]?\\s*([A-Za-z0-9]+)/i);\n\n// Find an email address in the text\nconst emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}/);\n\n// Return the results as separate fields\nreturn [\n  {\n    json: {\n      quantity: quantityMatch ? quantityMatch[1] : null,\n      code: codeMatch ? codeMatch[1] : null,\n      email: emailMatch ? emailMatch[0] : null,\n      rawText: text, // (optional) the full text for reference\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1980,
+        250
+      ],
+      "id": "5e4c0a69-2d0b-4a4a-a7b8-1529239f2399",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2420,
+        450
+      ],
+      "id": "fab7925a-8e8f-4f54-8fff-237f2a4cbd57",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1xsHcFCh6dsdhAbiIEPBWeMZYa9HSh0P3zp4Nl-96UUU",
+          "mode": "list",
+          "cachedResultName": " Incoming Orders Sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xsHcFCh6dsdhAbiIEPBWeMZYa9HSh0P3zp4Nl-96UUU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xsHcFCh6dsdhAbiIEPBWeMZYa9HSh0P3zp4Nl-96UUU/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -2200,
+        450
+      ],
+      "id": "4f6d9066-c004-4dd4-8f99-2f947877f9ac",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "FET9SywrvjtRSaY2",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 5,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1980,
+        450
+      ],
+      "id": "f0bcb71a-159e-4e56-b4a6-82b1c75c0d4d",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Replace Me",
+      "typeVersion": 1,
+      "position": [
+        -1760,
+        550
+      ],
+      "id": "b29c662d-c734-4321-a93a-534da3b998f1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\n// Loop backwards to find the last image/photo message\nfor (let i = items.length - 1; i >= 0; i--) {\n  const item = items[i];\n\n  const isPhotoMessage = item.json.message?.photo || item.binary?.data;\n\n  if (isPhotoMessage) {\n    return [item]; // Send only this item forward\n  }\n}\n\n// If no photo found, stop the workflow or return nothing\nreturn [];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2640,
+        250
+      ],
+      "id": "c5f64694-0e74-4793-bbd8-db9d55a55dc0",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.photo[0].file_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -2420,
+        250
+      ],
+      "id": "e226f989-248d-4031-bcd0-cfd1833085df",
+      "name": "Get a file",
+      "webhookId": "33d0b577-331f-471c-80f7-c2633da9c3f6",
+      "credentials": {
+        "telegramApi": {
+          "id": "vvRkEeCp1MAnJL81",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Telegram Trigger": [
+      {
+        "json": {
+          "update_id": 690665443,
+          "message": {
+            "message_id": 17,
+            "from": {
+              "id": 1757206026,
+              "is_bot": false,
+              "first_name": "DËMMY",
+              "username": "Demmygeneral",
+              "language_code": "en"
+            },
+            "chat": {
+              "id": 1757206026,
+              "first_name": "DËMMY",
+              "username": "Demmygeneral",
+              "type": "private"
+            },
+            "date": 1752700979,
+            "photo": [
+              {
+                "file_id": "AgACAgQAAxkBAAMQaHgUWxcOcvdZuUPU3EDH_np1WeMAAuvJMRvITcFT8-m3uSyle2kBAAMCAANzAAM2BA",
+                "file_unique_id": "AQAD68kxG8hNwVN4",
+                "file_size": 805,
+                "width": 68,
+                "height": 90
+              },
+              {
+                "file_id": "AgACAgQAAxkBAAMQaHgUWxcOcvdZuUPU3EDH_np1WeMAAuvJMRvITcFT8-m3uSyle2kBAAMCAANtAAM2BA",
+                "file_unique_id": "AQAD68kxG8hNwVNy",
+                "file_size": 11709,
+                "width": 241,
+                "height": 320
+              },
+              {
+                "file_id": "AgACAgQAAxkBAAMQaHgUWxcOcvdZuUPU3EDH_np1WeMAAuvJMRvITcFT8-m3uSyle2kBAAMCAAN4AAM2BA",
+                "file_unique_id": "AQAD68kxG8hNwVN9",
+                "file_size": 47093,
+                "width": 602,
+                "height": 800
+              },
+              {
+                "file_id": "AgACAgQAAxkBAAMQaHgUWxcOcvdZuUPU3EDH_np1WeMAAuvJMRvITcFT8-m3uSyle2kBAAMCAAN5AAM2BA",
+                "file_unique_id": "AQAD68kxG8hNwVN-",
+                "file_size": 86498,
+                "width": 964,
+                "height": 1280
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Check if data is correct": {
+      "main": [
+        [
+          {
+            "node": "Missing data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MCP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record order": {
+      "main": [
+        []
+      ]
+    },
+    "send order": {
+      "main": [
+        [
+          {
+            "node": "Record order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate the work order": {
+      "main": [
+        [
+          {
+            "node": "send order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Look up extra info": {
+      "main": [
+        [
+          {
+            "node": "Generate the work order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP": {
+      "main": [
+        [
+          {
+            "node": "Look up extra info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OCR": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Check if data is correct",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Missing data": {
+      "main": [
+        []
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Check if data is correct",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Replace Me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace Me": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "OCR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a8d927ad-c4d7-409f-bfc1-2fbb028906ec",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ea3105b499f3807cb93a4e430d295b08a7ee07a6e9feb3d21f98aec717d82209"
+  },
+  "id": "boSBvYqq6gVAtaep",
+  "tags": []
+}
